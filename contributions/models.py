@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class CaliforniaProp2012(models.Model):
+class Prop(models.Model):
     """
     A proposition on the 2012 California ballot.
     """
@@ -19,15 +19,15 @@ class CaliforniaProp2012(models.Model):
         return unicode("Proposition %s" % self.name)
 
 
-class CaliforniaCampaign2012(models.Model):
+class Campaign(models.Model):
     """
     Intermediary model between committees and props.
     
     Necessary because a committee can campaign for multiple
     propositions.
     """
-    committee = models.ForeignKey("CaliforniaCommittee2012")
-    prop = models.ForeignKey("CaliforniaProp2012")
+    committee = models.ForeignKey("Committee")
+    prop = models.ForeignKey("Prop")
     POSITION_CHOICES = (
         ('Support', 'Support'),
         ('Oppose', 'Oppose')
@@ -41,7 +41,7 @@ class CaliforniaCampaign2012(models.Model):
         return unicode("Campaign: %s %s" % (self.position, self.prop))
 
 
-class CaliforniaCommittee2012(models.Model):
+class Committee(models.Model):
     """
     A California campaign committee in the 2012 election.
     """
@@ -49,7 +49,7 @@ class CaliforniaCommittee2012(models.Model):
     sec_state_id = models.CharField(max_length=10)
     position = models.CharField(max_length=500, blank=True)
     has_multiple_campaigns = models.BooleanField(default=False)
-    campaigns = models.ManyToManyField("CaliforniaProp2012", through="CaliforniaCampaign2012")
+    campaigns = models.ManyToManyField("Prop", through="Campaign")
     objects = models.Manager()
     
     class Meta:
@@ -60,7 +60,7 @@ class CaliforniaCommittee2012(models.Model):
         return unicode(self.name)
 
 
-class CaliforniaContribution2012(models.Model):
+class Contribution(models.Model):
     """
     A finanical contribution made to a committee. A line-item.
     """
@@ -80,10 +80,10 @@ class CaliforniaContribution2012(models.Model):
     # used for committees donating to each other.
     sec_state_committee_id = models.CharField(max_length=500, blank=True,
         help_text='Filled in when a committee gives to another committee')
-    from_committee = models.ForeignKey("CaliforniaCommittee2012",
+    from_committee = models.ForeignKey("Committee",
         related_name='from_committee', blank=True, null=True)
     # and this is the committee the contribution went to
-    committee = models.ForeignKey("CaliforniaCommittee2012")
+    committee = models.ForeignKey("Committee")
     # CLEAN FIELDS
     clean_name = models.CharField(max_length=500, blank=True)
     clean_city = models.CharField(max_length=500, blank=True)

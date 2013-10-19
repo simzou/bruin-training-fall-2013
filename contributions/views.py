@@ -1,6 +1,6 @@
 from django.db.models import Sum, Count
 from django.views.generic import TemplateView
-from contributions.models import CaliforniaProp2012, CaliforniaContribution2012
+from contributions.models import Prop, Contribution
 
 
 class IndexView(TemplateView):
@@ -11,25 +11,25 @@ class IndexView(TemplateView):
         # grab our context, so we can add to it
         context = super(IndexView, self).get_context_data(**kwargs)
         # get all of the props
-        props = CaliforniaProp2012.objects.all()
+        props = Prop.objects.all()
         # set up an empty data dictionary
         data = []
         # loop through all the props, and grab their totals
         for i in props:
             # grab the IDs of all the commitees that support the prop
-            support_committees = i.californiacampaign2012_set.filter(position='Support')\
+            support_committees = i.campaign_set.filter(position='Support')\
                                     .values_list('committee_id', flat=True)
             # And all the committees that oppose it
-            oppose_committees = i.californiacampaign2012_set.filter(position='Oppose')\
+            oppose_committees = i.campaign_set.filter(position='Oppose')\
                                     .values_list('committee_id', flat=True)
             # Then use those committee IDs to filter on the contributions
             # that either support or oppose the proposition.
             # Use the Django aggregate method to add them all up.
             data.append({
                 'prop': i.name,
-                'support': CaliforniaContribution2012.objects.filter(committee_id__in=support_committees)\
+                'support': Contribution.objects.filter(committee_id__in=support_committees)\
                                 .aggregate(sum=Sum('amount'))['sum'] or 0,
-                'oppose': CaliforniaContribution2012.objects.filter(committee_id__in=oppose_committees)\
+                'oppose': Contribution.objects.filter(committee_id__in=oppose_committees)\
                                 .aggregate(sum=Sum('amount'))['sum'] or 0,
             })
         # put all of the values in a single list
@@ -41,7 +41,7 @@ class IndexView(TemplateView):
 
         # Here we can get a list of all of the unique contributor names
         # along with their total contributions
-        contributors = CaliforniaContribution2012.objects.values('clean_name')\
+        contributors = Contribution.objects.values('clean_name')\
                     .annotate(contribs=Sum('amount')).order_by('-contribs')
 
         context['contributors'] = contributors[0:10]
