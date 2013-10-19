@@ -19,7 +19,7 @@ Clone down the training repo.
 
 Enter the project and install its dependencies.
 
-<pre><code>$ cd reop
+<pre><code>$ cd repo
 $ pip install -r requirements.txt</code></pre>
 
 h2. Installing SQLite
