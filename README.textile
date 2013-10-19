@@ -1,6 +1,6 @@
 h1. bruin-training
 
-A simple training app for Daily Bruin trainees
+A simple training app for Daily Bruin trainees, using campaign contribution data from the 2012 California Propositions.
 
 h2. Initial setup:
 
