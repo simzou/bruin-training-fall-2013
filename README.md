@@ -30,7 +30,7 @@ Install SQLite
 
 Then set up the test database
 
-<pre><code>$ sqlite3 test
+<pre><code>$ sqlite3 contributions
 > .exit</code></pre>
 
 h2. Starting up the Django project
