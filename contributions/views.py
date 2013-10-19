@@ -1,3 +1,5 @@
+import json
+
 from django.db.models import Sum, Count
 from django.views.generic import TemplateView
 from contributions.models import Prop, Contribution
@@ -47,4 +49,5 @@ class IndexView(TemplateView):
         context['contributors'] = contributors[0:10]
         context['max_value'] = max(all_vals)
         context['summary_data'] = data
+        context['summary_json'] = json.dumps(data)
         return context

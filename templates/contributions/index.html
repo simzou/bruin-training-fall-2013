@@ -10,7 +10,7 @@
         margin:1px 0;
     }
     .oppose {
-        background: pink;
+        background: red;
     }
     .support {
         background: green;
@@ -69,4 +69,8 @@
     <div class="clear"></div>
     {% endfor %}
 </div>
+<script>
+    var data = {{summary_json|safe }};
+    console.log(data);
+</script>
 {% endblock %}
