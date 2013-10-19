@@ -37,5 +37,10 @@ h2. Starting up the Django project
 
 Sync the database, and run our script to load in the data.
 
-<pre><code>$ python manage.py syncdb
-$ python manage.py load</code></pre>
+<pre><code>$ python manage.py syncdb</code></pre>
+
+Turn on the test server, and see what you have!
+
+<pre><code>$ python manage.py runserver</code></pre>
+
+Go to "http://localhost:8000/":http://localhost:8000/
