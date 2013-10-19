@@ -36,7 +36,6 @@ class CaliforniaCampaign2012(models.Model):
     
     class Meta:
         app_label = 'contributions'
-        verbose_name = '2012: Campaign'
     
     def __unicode__(self):
         return unicode("Campaign: %s %s" % (self.position, self.prop))

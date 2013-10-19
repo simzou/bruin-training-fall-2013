@@ -1,7 +1,72 @@
 {% extends 'base.html' %}
+{% load humanize %}
+
+{% block extra-css %}
+<style type="text/css">
+    .bar {
+        height: 30px;
+        display:inline-block;
+        float:left;
+        margin:1px 0;
+    }
+    .oppose {
+        background: red;
+    }
+    .support {
+        background: green;
+    }
+    .bar-label {
+        display:inline-block;
+        float:left;
+        margin: 6px 0 0 6px;
+    }
+    .bar-container {
+        clear:both;
+    }
+    .clear {
+        clear:both;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>Hello there</h1>
+    <div class="page-header">
+        <h1>Contribution Data</h1>
+    </div>
+
+    <h2>Money by contributor</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in contributors %}
+            <tr>
+                <td>{{ i.clean_name }}</td>
+                <td>${{ i.contribs|intcomma }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Money by Prop.</h2>
+    
+    {% for i in summary_data %}
+    <h4>Prop. {{ i.prop }}</h4>
+    <div class="bar-container">
+        <span class="bar support" style="width:{% widthratio i.support max_value 800 %}px"></span>
+        <span class="bar-label">${{ i.support|intcomma }}</span>
+    </div>
+    <div class="bar-container">
+        <span class="bar oppose" style="width:{% widthratio i.oppose max_value 800 %}px"></span>
+        <span class="bar-label">${{ i.oppose|intcomma }}</span>
+    </div>
+    <div class="clear"></div>
+    {% endfor %}
 </div>
 {% endblock %}
