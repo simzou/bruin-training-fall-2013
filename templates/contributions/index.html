@@ -40,13 +40,15 @@
     <table class="table">
         <thead>
             <tr>
+                <th>Rank</th>
                 <th>Name</th>
                 <th>Amount</th>
             </tr>
         </thead>
         <tbody>
-            {% for i in contributors %}
+            {% for num, i in contributors %}
             <tr>
+                <td>{{num}}</td>
                 <td>{{ i.clean_name }}</td>
                 <td>${{ i.contribs|intcomma }}</td>
             </tr>
