@@ -13,7 +13,7 @@
         background: red;
     }
     .support {
-        background: blue;
+        background: green;
     }
     .bar-label {
         display:inline-block;
@@ -26,6 +26,28 @@
     .clear {
         clear:both;
     }
+
+    body {
+      font: 10px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .barchart-bar {
+      fill: green;
+    }
+    .barchart-bar-state {
+      fill: blue;
+    }
+
+    .x.axis path {
+      display: none;
+}
 </style>
 {% endblock %}
 
@@ -70,9 +92,160 @@
     </div>
     <div class="clear"></div>
     {% endfor %}
+
+    <div class="bar-container">
+        <h2>Amount Supporting Each Proposition</h2>
+        <div id="d3-barchart"></div>
+    </div>
+
+    <div class="bar-container">
+        <h2>Contributions by State</h2>
+        <div id="d3-barchart2"></div>
+    </div>
+
 </div>
 <script>
     var data = {{ summary_json|safe }};
-    console.log(data);
+    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1);
+
+    var y = d3.scale.linear()
+        .range([height, 0]);
+
+    var color = d3.scale.ordinal()
+        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .tickFormat(d3.format(".2s"));
+
+    var svg = d3.select("#d3-barchart").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    x.domain(data.map(function(d){
+        return d.prop;
+    }));
+    y.domain([0, d3.max(data, function(d){
+        return d.support;
+    })]);
+
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Donation");
+
+    svg.selectAll(".barchart-bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "barchart-bar")
+        .attr("x", function(d) { return x(d.prop); })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) { return y(d.support); })
+        .attr("height", 0)
+        .on("mouseover", function(d){
+            d3.select(this)
+                .style("fill", "orange");
+        })
+        .on("mouseout", function(d){
+            d3.select(this)
+                .style("fill", "green");
+        })
+        .transition().duration(2000).ease("bounce")
+        .attr("height", function(d) { return height - y(d.support); })
+    //var c = {{ contributor_list|safe }};
+</script>
+
+<script>
+    var data = {{ state_amounts|safe }};
+    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1);
+
+    var y = d3.scale.linear()
+        .range([height, 0]);
+
+    var color = d3.scale.ordinal()
+        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .tickFormat(d3.format(".2s"));
+
+    var svg = d3.select("#d3-barchart2").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    x.domain(data.map(function(d){
+        return d.state;
+    }));
+    y.domain([0, d3.max(data, function(d){
+        return d.contribs;
+    })]);
+
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Donation");
+
+    svg.selectAll(".barchart-bar-state")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "barchart-bar-state")
+        .attr("x", function(d) { return x(d.state); })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) { return y(d.contribs); })
+        .attr("height", 0)
+        .on("mouseover", function(d){
+            d3.select(this)
+                .style("fill", "orange");
+        })
+        .on("mouseout", function(d){
+            d3.select(this)
+                .style("fill", "blue");
+        })
+        .transition().duration(2000).ease("bounce")
+        .attr("height", function(d) { return height - y(d.contribs); })
 </script>
 {% endblock %}
